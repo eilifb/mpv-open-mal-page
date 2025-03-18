@@ -3,12 +3,12 @@ local utils = require('mp.utils')
 local mpopt = require('mp.options')
 
 local config = {
-    subliminal = "",
+    python = "",
     mal_id = "",
     debug = false
 }
 
-local function log_debug(input, secs)
+local function log_debug(input)
     if not config.debug then
         return
     end
@@ -29,20 +29,42 @@ local function log_debug(input, secs)
 end
 
 
-local function init()
+function Open_mal_page()
     mpopt.read_options(config, "open-mal-page")
 
-    log_debug(config.subliminal)
+    log_debug(config.python)
     log_debug(config.mal_id)
 
-    if utils.file_info(config.subliminal) == nil then
-        mp.msg.error("subliminal path not found!")
+    if utils.file_info(config.python) == nil then
+        mp.msg.error("python path not found!")
         mp.osd_message("ERROR: open-mal-page - Subliminal not found!")
         return
     end
 
 
+    local filepath = mp.get_property("path")
+    log_debug("filepath: "..filepath)
+    local args = {
+        config.python,
+        mp.get_script_directory().."/open_mal_page.py",
+        filepath
+    }
+
+    log_debug("args: "..utils.to_string(args))
+
+    local output = mp.command_native {
+        name = "subprocess",
+        playback_only = false,
+        capture_stdout = true,
+        args = args
+    }
+
+    if config.debug then
+        for line in string.gmatch(output["stdout"], "(.-)\n") do
+            mp.msg.warn("Python: "..line)
+        end
+    end
     log_debug("open-mal-page finished!")
 end
 
-init()
+mp.add_key_binding('ø', 'open_mal_page', Open_mal_page)
