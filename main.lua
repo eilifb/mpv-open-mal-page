@@ -33,24 +33,32 @@ function Open_mal_page()
     mpopt.read_options(config, "open-mal-page")
 
     log_debug(config.python)
-    log_debug(config.mal_id)
 
     if utils.file_info(config.python) == nil then
         mp.msg.error("python path not found!")
-        mp.osd_message("ERROR: open-mal-page - Subliminal not found!")
+        mp.osd_message("ERROR: open-mal-page - Python path not found!")
+        return
+    end
+
+    if config.mal_id == "" then
+        mp.msg.error("MAL Client ID not supplied")
+        mp.osd_message("ERROR: open-mal-page - Need MAL Client ID!")
         return
     end
 
 
-    local filepath = mp.get_property("path")
-    log_debug("filepath: "..filepath)
+
     local args = {
         config.python,
         mp.get_script_directory().."/open_mal_page.py",
-        filepath
+        mp.get_property("path"),
+        config.mal_id
     }
 
     log_debug("args: "..utils.to_string(args))
+
+    mp.osd_message("Quering MAL...", 30)
+    mp.msg.warn("Searching... (running python script)")
 
     local output = mp.command_native {
         name = "subprocess",
@@ -59,12 +67,25 @@ function Open_mal_page()
         args = args
     }
 
+
     if config.debug then
         for line in string.gmatch(output["stdout"], "(.-)\n") do
             mp.msg.warn("Python: "..line)
         end
     end
+
+    if output["status"] == 0 then
+        mp.osd_message("Found match! Opening page...")
+        mp.msg.warn("Found match! Opening page...")
+    elseif output["status"] == 1 then
+        mp.osd_message("Found no match.")
+        mp.msg.warn("Found no match.")
+    elseif output["status"] == 2 then
+        mp.osd_message("Got unexpected respnse from MAL")
+        mp.msg.warn("Got unexpected respnse from MAL")
+    end
+
     log_debug("open-mal-page finished!")
 end
 
-mp.add_key_binding('ø', 'open_mal_page', Open_mal_page)
+mp.add_key_binding('Alt+m', 'open_mal_page', Open_mal_page)
