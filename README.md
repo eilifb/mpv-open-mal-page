@@ -45,7 +45,7 @@ Coming soon ™
 
 Should be pretty easy to set up yourself though.
 
-<a name="#conf" />
+<a name="conf" />
 
 ## Configuration
 
