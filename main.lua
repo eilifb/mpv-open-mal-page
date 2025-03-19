@@ -5,7 +5,7 @@ local mpopt = require('mp.options')
 local config = {
     python = "",
     mal_id = "",
-    title_match = "",
+    title_threshold = "0.55",
     debug = false
 }
 
@@ -54,7 +54,7 @@ function Open_mal_page()
         mp.get_script_directory().."/open_mal_page.py",
         mp.get_property("path"),
         config.mal_id,
-        config.title_match
+        config.title_threshold
     }
 
     log_debug("python_call: "..utils.to_string(python_call))

@@ -20,7 +20,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 def main():
     file_path = sys.argv[1]
     mal_id = sys.argv[2]
-    title_match = bool(sys.argv[3])
+    title_threshold = float(sys.argv[3])
 
     print("filepath: %s" % (file_path))
     guessit_match = guessit(file_path)
@@ -37,8 +37,8 @@ def main():
 
     if "year" in guessit_match:
         params["q"] += f"+{guessit_match["year"]}"
-    if title_match:
-        params["fields"] = "alternative_titles"
+
+    params["fields"] = "alternative_titles"
 
     print(
         f"GET url: {mal_url}"
@@ -53,44 +53,46 @@ def main():
     if response.status_code == 200:
         result = response.json()
         if result["data"]:  # If match found
-            if title_match:
-                nodes = [nodes["node"] for nodes in result["data"]]
-                print("No. query results: %i" % (len(nodes)))
-                print("First match title %s" % (nodes[0]["title"]))
-                for entry in nodes:
-                    # If the title guessit found matches the 'primary title':
+            nodes = [nodes["node"] for nodes in result["data"]]
+            print("No. query results: %i" % (len(nodes)))
+            print("First match title %s" % (nodes[0]["title"]))
+            for entry in nodes:
+                title_similarity = SM(
+                    None, guessit_match["title"], entry["title"]
+                ).ratio()
+                print(
+                    "comp. titles: %s <-> %s (%.3f)"
+                    % (
+                        guessit_match["title"],
+                        entry["title"],
+                        SM(
+                            None, guessit_match["title"], entry["title"]
+                        ).ratio(),
+                    )
+                )
+                if title_similarity >= title_threshold:
+                    open_mal_page(entry["id"])
+                    sys.exit(0)
+
+                # Checking against all alternative titles
+                for alt_title in titles_to_list(entry["alternative_titles"]):
+                    title_similarity = SM(
+                        None, guessit_match["title"], alt_title
+                    ).ratio()
                     print(
                         "comp. titles: %s <-> %s (%.3f)"
                         % (
                             guessit_match["title"],
-                            entry["title"],
-                            SM(None, guessit_match["title"], entry["title"]).ratio(),
+                            alt_title,
+                            title_similarity,
                         )
                     )
-                    if guessit_match["title"] == entry["title"]:
+                    if title_similarity >= title_threshold:
                         open_mal_page(entry["id"])
                         sys.exit(0)
+            print("No exact match found!")
+            sys.exit(3)
 
-                    # Checking against all alternative titles
-                    for alt_title in titles_to_list(
-                        entry["alternative_titles"]
-                    ):
-                        print(
-                            "comp. titles: %s <-> %s (%.3f)"
-                            % (
-                                guessit_match["title"],
-                                alt_title,
-                                SM(None, guessit_match["title"], alt_title).ratio(),
-                            )
-                        )
-                        if guessit_match["title"] == alt_title:
-                            open_mal_page(entry["id"])
-                            sys.exit(0)
-                print("No exact match found!")
-                sys.exit(3)
-
-            open_mal_page(result["data"][0]["node"]["id"])
-            sys.exit(0)
         else:
             print("No match!")
             sys.exit(1)
