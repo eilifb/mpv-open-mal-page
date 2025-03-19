@@ -9,7 +9,7 @@ Requires guessit (https://pypi.org/project/guessit/) and a MAL API Client ID.
 import sys
 import io
 import requests
-import urllib.parse
+from urllib import parse
 import webbrowser
 from difflib import SequenceMatcher as SM
 from guessit import guessit
@@ -28,77 +28,76 @@ def main():
     for key, match in guessit_match.items():
         print("GuessIt: %s - %s" % (key, match))
 
-        pass
-
-    mal_url = "https://api.myanimelist.net/v2/anime"
     params = {
-        "q": urllib.parse.quote_plus(guessit_match["title"]),
+        "q": parse.quote_plus(guessit_match["title"]),
+        "fields": "alternative_titles"
     }
 
     if "year" in guessit_match:
         params["q"] += f"+{guessit_match["year"]}"
 
-    params["fields"] = "alternative_titles"
+    mal_url = "https://api.myanimelist.net/v2/anime"
+    param_url = parse.urlencode(params)
+    full_url = f"{mal_url}?{param_url}"
 
-    print(
-        f"GET url: {mal_url}"
-        "?"
-        f"{"&".join([i[0]+"="+i[1] for i in params.items()])}"
-    )
-    response = requests.get(
-        mal_url, params=params, headers={"X-MAL-CLIENT-ID": mal_id}
-    )
+    print(f"GET url: {full_url}")
 
-    print("MAL response: %i" % (response.status_code))
-    if response.status_code == 200:
-        result = response.json()
-        if result["data"]:  # If match found
-            nodes = [nodes["node"] for nodes in result["data"]]
-            print("No. query results: %i" % (len(nodes)))
-            print("First match title %s" % (nodes[0]["title"]))
-            for entry in nodes:
-                title_similarity = SM(
-                    None, guessit_match["title"], entry["title"]
-                ).ratio()
-                print(
-                    "comp. titles: %s <-> %s (%.3f)"
-                    % (
-                        guessit_match["title"],
-                        entry["title"],
-                        SM(
-                            None, guessit_match["title"], entry["title"]
-                        ).ratio(),
-                    )
-                )
-                if title_similarity >= title_threshold:
-                    open_mal_page(entry["id"])
-                    sys.exit(0)
+    response = requests.get(full_url, headers={"X-MAL-CLIENT-ID": mal_id})
 
-                # Checking against all alternative titles
-                for alt_title in titles_to_list(entry["alternative_titles"]):
-                    title_similarity = SM(
-                        None, guessit_match["title"], alt_title
-                    ).ratio()
-                    print(
-                        "comp. titles: %s <-> %s (%.3f)"
-                        % (
-                            guessit_match["title"],
-                            alt_title,
-                            title_similarity,
-                        )
-                    )
-                    if title_similarity >= title_threshold:
-                        open_mal_page(entry["id"])
-                        sys.exit(0)
-            print("No exact match found!")
-            sys.exit(3)
+    print("MAL response code: %i" % (response.status_code))
 
-        else:
-            print("No match!")
-            sys.exit(1)
-    else:
+    if response.status_code != 200:
         print("Unexpected response code!")
         sys.exit(2)
+
+    query_result = response.json()
+
+    if not query_result["data"]:
+        print("MAL query returned nothing!")
+        sys.exit(1)
+
+    matching_id = match_titles(
+        query_result, guessit_match["title"], title_threshold
+    )
+
+    if matching_id:
+        open_mal_page(matching_id)
+        sys.exit(0)
+    else:
+        print("No exact match found!")
+        sys.exit(3)
+
+
+def match_titles(mal_response: dict, title_to_match, title_threshold):
+    result = mal_response
+    nodes = [nodes["node"] for nodes in result["data"]]
+    print("No. query results: %i" % (len(nodes)))
+    print("First match title %s" % (nodes[0]["title"]))
+    for entry in nodes:
+        title_similarity = SM(None, title_to_match, entry["title"]).ratio()
+
+        print(
+            "comp. titles: %s <-> %s (%.3f)"
+            % (title_to_match, entry["title"], title_similarity)
+        )
+
+        if title_similarity >= title_threshold:
+            return entry["id"]
+
+        # Checking against alternative titles
+        for alt_title in titles_to_list(entry["alternative_titles"]):
+            title_similarity = SM(None, title_to_match, alt_title).ratio()
+            print(
+                "comp. titles: %s <-> %s (%.3f)"
+                % (
+                    title_to_match,
+                    alt_title,
+                    title_similarity,
+                )
+            )
+            if title_similarity >= title_threshold:
+                return entry["id"]
+    return None
 
 
 def open_mal_page(id: str):

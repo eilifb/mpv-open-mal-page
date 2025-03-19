@@ -80,8 +80,8 @@ function Open_mal_page()
         mp.osd_message("Found match! Opening page...")
         mp.msg.warn("Found match! Opening page...")
     elseif output["status"] == 1 then
-        mp.osd_message("Found no match.")
-        mp.msg.warn("Found no match.")
+        mp.osd_message("MAL query returned nothing.")
+        mp.msg.warn("MAL query returned nothing.")
     elseif output["status"] == 2 then
         mp.osd_message("Got unexpected respnse from MAL")
         mp.msg.warn("Got unexpected respnse from MAL")
