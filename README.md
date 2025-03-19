@@ -3,7 +3,7 @@
 
 Simple mpv script that uses [GuessIt](https://pypi.org/project/guessit/) to
 make a query to the [My Anime List API](https://myanimelist.net/apiconfig/references/api/v2)
-and opens up the corresponding MAL webpage if a match is found.
+and opens up the corresponding MAL webpage if a match is found. Inspired by [ctlaltdefeat's Open IMDb Page Script](https://github.com/ctlaltdefeat/mpv-open-imdb-page).
 The script takes (part of) the filepath and queries MAL, and then makes a comparison
 between filepath and titles of the shows/movies returned by MAL. If  the similarity is over a given threshold it opens a tab to MAL.
 
