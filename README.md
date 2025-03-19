@@ -4,6 +4,10 @@
 Simple mpv script that uses [GuessIt](https://pypi.org/project/guessit/) to
 make a query to the [My Anime List API](https://myanimelist.net/apiconfig/references/api/v2)
 and opens up the corresponding MAL webpage if a match is found.
+The script takes (part of) the filepath and queries MAL, and then makes a comparison
+between filepath and titles of the shows/movies returned by MAL.
+
+See [Configuration](#conf) for options.
 
 The Python script can be used on its own if you want to do that for some reason.
 
@@ -40,6 +44,35 @@ Replace the placeholders, cant be bothered to do that in powershell.
 Coming soon ™
 
 Should be pretty easy to set up yourself though.
+
+<a name="#conf" />
+
+## Configuration
+
+All configuration options are set via `/scrip-opts/open-mal-page.conf`
+#### python **Required!**
+- Path to your python installation. You can get the path to your python installation with `(get-command python).Path` on Windows, or `which python3` on OSX/Linux
+
+#### mal_id **Required!**
+- Your My Anime List Client ID. You need a MAL profile, and can generate it at your profile's [API panel](https://myanimelist.net/apiconfig).
+
+#### title_threshold
+- How similar the title GuessIt finds has to be to title(s) returned by MAL.
+Setting this to `1.00` means that the title has to be a exact match, while setting it to `0.00` means that it will match
+with the first result returned by MAL. MAL's query is quite lenient, so `0.00` will almost always return *something*.
+- Note that `GuessIt` can sometimes remove characters from the filepath that actually belong to the title, so I don't recommend setting `title_threshold=1.00`.
+
+    E.G. `guessit "C:\Anime\[DVD_ISO] Blue Submarine No. 6 (US)\Episode 01.mkv"` will return the title `Blue Submarine No 6` (missing `.`), and thus not exactly match the title stored in MAL's database.
+- The default value is `title_threshold=0.55`, which seems to be a good in-between. But feel free to experiment.
+- Some examples:
+    - *Blue Submarine No 6* to *Blue Submarine No. 6* gives a **0.974** match
+    - *yu-gi-oh gx* to * Yu☆Gi☆Oh! Duel Monsters GX* gives a **0.216** match
+    - *yu-gi-oh gx* to *Yugioh GX* gives a **0.600** match
+
+#### debug
+- Makes the script output quite a lot of output that may or may not be helpful/make sense-
+- Default is `debug=no`
+
 ## TODO
 - [ ] Confirm Linux/OSX compatability (Can't see why it shouldn't)
 - [ ] Write a installation guide for Linux/OSX
