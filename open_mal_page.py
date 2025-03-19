@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
-doc
+Tries to extract a Title and Year from a (media) filepath, and does a MAL API
+query. If a match is found the program opens the corresponding MAL webpage.
+Requires guessit (https://pypi.org/project/guessit/) and a MAL API Client ID.
 """
 import sys
 import requests
