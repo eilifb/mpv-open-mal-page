@@ -57,7 +57,7 @@ function Open_mal_page()
 
     log_debug("args: "..utils.to_string(args))
 
-    mp.osd_message("Quering MAL...", 30)
+    mp.osd_message("querying MAL...", 30)
     mp.msg.warn("Searching... (running python script)")
 
     local output = mp.command_native {
