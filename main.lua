@@ -5,6 +5,7 @@ local mpopt = require('mp.options')
 local config = {
     python = "",
     mal_id = "",
+    title_match = "",
     debug = false
 }
 
@@ -48,14 +49,15 @@ function Open_mal_page()
 
 
 
-    local args = {
+    local python_call = {
         config.python,
         mp.get_script_directory().."/open_mal_page.py",
         mp.get_property("path"),
-        config.mal_id
+        config.mal_id,
+        config.title_match
     }
 
-    log_debug("args: "..utils.to_string(args))
+    log_debug("python_call: "..utils.to_string(python_call))
 
     mp.osd_message("querying MAL...", 30)
     mp.msg.warn("Searching... (running python script)")
@@ -64,7 +66,7 @@ function Open_mal_page()
         name = "subprocess",
         playback_only = false,
         capture_stdout = true,
-        args = args
+        args = python_call
     }
 
 
@@ -83,6 +85,9 @@ function Open_mal_page()
     elseif output["status"] == 2 then
         mp.osd_message("Got unexpected respnse from MAL")
         mp.msg.warn("Got unexpected respnse from MAL")
+    elseif output["status"] == 3 then
+        mp.osd_message("Found no match with exact title.")
+        mp.msg.warn("Found no match with exact title.")
     end
 
     log_debug("open-mal-page finished!")
