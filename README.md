@@ -5,7 +5,7 @@ Simple mpv script that uses [GuessIt](https://pypi.org/project/guessit/) to
 make a query to the [My Anime List API](https://myanimelist.net/apiconfig/references/api/v2)
 and opens up the corresponding MAL webpage if a match is found.
 The script takes (part of) the filepath and queries MAL, and then makes a comparison
-between filepath and titles of the shows/movies returned by MAL.
+between filepath and titles of the shows/movies returned by MAL. If  the similarity is over a given threshold it opens a tab to MAL.
 
 See [Configuration](#conf) for options.
 
@@ -71,7 +71,7 @@ with the first result returned by MAL. MAL's query is quite lenient, so `0.00` w
     - *yu-gi-oh gx* and * Yu☆Gi☆Oh! Duel Monsters GX* gives a **0.216** match
 
 #### debug
-- Makes the script output quite a lot of output that may or may not be helpful/make sense-
+- Makes the script output quite a lot of text that may or may not be helpful/make sense
 - Default is `debug=no`
 
 ## TODO
