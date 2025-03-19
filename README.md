@@ -63,11 +63,12 @@ with the first result returned by MAL. MAL's query is quite lenient, so `0.00` w
 - Note that `GuessIt` can sometimes remove characters from the filepath that actually belong to the title, so I don't recommend setting `title_threshold=1.00`.
 
     E.G. `guessit "C:\Anime\[DVD_ISO] Blue Submarine No. 6 (US)\Episode 01.mkv"` will return the title `Blue Submarine No 6` (missing `.`), and thus not exactly match the title stored in MAL's database.
-- The default value is `title_threshold=0.55`, which seems to be a good in-between. But feel free to experiment.
+- The default value is `title_threshold=0.80`, which seems to work well. But feel free to experiment.
 - Some examples:
-    - *Blue Submarine No 6* to *Blue Submarine No. 6* gives a **0.974** match
-    - *yu-gi-oh gx* to * Yu☆Gi☆Oh! Duel Monsters GX* gives a **0.216** match
-    - *yu-gi-oh gx* to *Yugioh GX* gives a **0.600** match
+    - *Blue Submarine No 6* and *Blue Submarine No. 6* gives a **0.974** match
+    - *Trapeze* and *Trapezium* gives a **0.75** match
+    - *yu-gi-oh gx* and *Yugioh GX* gives a **0.600** match
+    - *yu-gi-oh gx* and * Yu☆Gi☆Oh! Duel Monsters GX* gives a **0.216** match
 
 #### debug
 - Makes the script output quite a lot of output that may or may not be helpful/make sense-
