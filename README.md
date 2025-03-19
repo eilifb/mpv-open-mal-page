@@ -39,7 +39,7 @@ Replace the placeholders, cant be bothered to do that in powershell.
 ### Linux/OSX:
 Coming soon ™
 
-Should be pretty easy set up yourself though.
+Should be pretty easy to set up yourself though.
 ## TODO
 - [ ] Confirm Linux/OSX compatability (Can't see why it shouldn't)
 - [ ] Write a installation guide for Linux/OSX
