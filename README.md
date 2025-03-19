@@ -1,4 +1,6 @@
 # Open My Anime List Page
+![image](banner.jpg)
+
 Simple mpv script that uses [GuessIt](https://pypi.org/project/guessit/) to
 make a query to the [My Anime List API](https://myanimelist.net/apiconfig/references/api/v2)
 and opens up the corresponding MAL webpage if a match is found.
